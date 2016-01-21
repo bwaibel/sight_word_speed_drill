@@ -4,7 +4,7 @@ var babelify = require('babelify');
 var uglify = require('gulp-uglify');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
-var less = require('gulp-less');
+var sass = require('gulp-sass');
 var gulpif = require('gulp-if');
 
 var config = require('../config.js');
@@ -33,9 +33,9 @@ gulp.task('html', function () {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('less', function() {
-  return gulp.src('src/less/app.less')
-    .pipe(less())
+gulp.task('css', function() {
+  return gulp.src('src/styles/main.scss')
+    .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest('dist'));
 });
 
@@ -44,5 +44,5 @@ gulp.task('prod', function(cb) {
   cb();
 })
 
-gulp.task('build', ['jsx','html','less', 'images']);
-gulp.task('build:prod', ['prod','jsx','html','less', 'images']);
+gulp.task('build', ['jsx','html','css', 'images']);
+gulp.task('build:prod', ['prod','jsx','html','css', 'images']);
