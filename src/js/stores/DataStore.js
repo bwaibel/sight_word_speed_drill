@@ -7,11 +7,11 @@ var _ = require('underscore');
 
 var words = require('../constants/Words');
 // TODO: calculate an ema 
-var min_reaction_time = 600;
-var target_guess_time = 1200; // millis per guess looking for 100 guesses per minute
+var min_reaction_time = 1000;
+var target_guess_time = 2000; // millis per guess looking for 100 guesses per minute
 // initialize mean scores with row 0 getting a perfect score and everything else more difficult
 var word_row_means = words.map(function(value,index) {
-  return (Math.pow(2, index * (100/words.length)) * (target_guess_time - min_reaction_time)) + min_reaction_time;
+  return (Math.pow(2, index) * (target_guess_time - min_reaction_time)) + min_reaction_time;
 });
 
 function chooseRow() {
@@ -20,7 +20,7 @@ function chooseRow() {
     var after_reaction_mean = mean - min_reaction_time;
     if(after_reaction_mean <= 0) {
       // faster than reaction time is heavily penalized
-      return 1/50;
+      return 1/500;
     }
     else {
       // inverse log2 distance from the mean plus 
@@ -47,7 +47,7 @@ var _data = {
   column_num: 0,
   answers: [],
   drill_started_at: new Date() + 3600000*24*365,
-  word_started_at: null,
+  word_started_at: new Date(),
   game_finished: false
 };
 
@@ -57,10 +57,23 @@ function startDrill() {
 }
 
 function nextWord(score) {
+  
   if(score != 0) {
     var stop_time = new Date();
+    var current_duration = stop_time - _data.word_started_at;
+    if(!isNaN(current_duration) && score > 0) {
+      var current_mean = word_row_means[_data.row_num];
+      var ema_alpha = 0.25;
+
+      // keep track of the row's ema
+      word_row_means[_data.row_num] = ema_alpha * current_mean + (1 - ema_alpha) * current_duration;
+    }
+    
     _data.answers.push({word:_data.word,score:score,duration: stop_time - _data.word_started_at});
   }
+  
+  console.log(score, current_duration, word_row_means);
+
   _data.row_num = chooseRow();
   _data.column_num = Math.floor(Math.random() * words[_data.row_num].length)
   _data.word = words[_data.row_num][_data.column_num];
