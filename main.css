@@ -5819,3 +5819,12 @@ button.close {
 
 body {
   background-color: #eee; }
+
+.container {
+  min-height: 100%; }
+
+.fill {
+  min-height: 100%;
+  min-width: 100%;
+  padding-top: 15%;
+  font-size: 245%; }
