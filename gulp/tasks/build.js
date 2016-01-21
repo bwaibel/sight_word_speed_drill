@@ -39,10 +39,15 @@ gulp.task('css', function() {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('resources', function() {
+  return gulp.src('src/resources/**/*')
+    .pipe(gulp.dest('dist'));
+})
+
 gulp.task('prod', function(cb) {
   config.switch('production');
   cb();
 })
 
-gulp.task('build', ['jsx','html','css', 'images']);
-gulp.task('build:prod', ['prod','jsx','html','css', 'images']);
+gulp.task('build', ['jsx','html','css', 'images','resources']);
+gulp.task('build:prod', ['prod','jsx','html','css', 'images','resources']);
