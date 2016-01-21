@@ -3,6 +3,7 @@ var DataStore = require('../stores/DataStore');
 var Actions = require('../actions/Actions.js');
 var StoreToState = require('./mixins/StoreToState.js');
 
+var history = require('react-router').browserHistory;
 
 module.exports = React.createClass({
 
@@ -15,11 +16,20 @@ module.exports = React.createClass({
   guessRight: function(event) {
     Actions.guessRight();
   },
+  
+  endDrill: function() {
+    Actions.endDrill();
+    history.replace('/results');
+  },
+  
+  componentDidMount: function() {
+    setTimeout(this.endDrill, 6000);
+  },
 
   render: function() {
     console.log(this.state)
     return (
-      <div onClick={this.guessRight} className="words" style={{"font-size": "100px", "font-family":"sans-serif"}}>{this.state.word}</div>
+      <h1><div onClick={this.guessRight} className="words">{this.state.word}</div></h1>
     );
   }
 

@@ -18,7 +18,11 @@ module.exports = {
     AppDispatcher.handleViewAction({
       type: ActionTypes.START_DRILL
     })
-  
+  },
+  endDrill: function() {
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.END_DRILL
+    })
   }
 }
 

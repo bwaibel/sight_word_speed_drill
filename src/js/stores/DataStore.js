@@ -2,8 +2,12 @@ var AppDispatcher = require('../dispatchers/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var Constants = require('../constants/AppConstants');
 var ActionTypes = Constants.ActionTypes;
+var Actions = require('../actions/Actions');
 var assign = require('object-assign');
 var _ = require('underscore');
+
+var Router = require('react-router');
+console.log(Router);
 
 var words = require('../constants/Words');
 // TODO: calculate an ema 
@@ -48,12 +52,16 @@ var _data = {
   answers: [],
   drill_started_at: new Date() + 3600000*24*365,
   word_started_at: new Date(),
-  game_finished: false
 };
 
 function startDrill() {
   _data.drill_started_at = new Date();
   nextWord(0);
+}
+
+function endDrill() {
+  _data.results = _data.answers;
+  _data.answers = [];
 }
 
 function nextWord(score) {
@@ -112,6 +120,10 @@ var DataStore = assign({}, EventEmitter.prototype, {
         break;
       case ActionTypes.START_DRILL:
         startDrill();
+        DataStore.emitChange();
+        break;
+      case ActionTypes.END_DRILL:
+        endDrill();
         DataStore.emitChange();
         break;
     }
