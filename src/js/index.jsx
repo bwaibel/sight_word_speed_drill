@@ -12,7 +12,7 @@ var Drill = require('./components/Drill.jsx');
 var Results = require('./components/Results.jsx');
 
 var routes = (
-  <Router history={ReactRouter.hashHistory}>
+  <Router history={ReactRouter.browserHistory}>
     <Route name="app" path="/" component={App}>
       <IndexRoute component={Launcher} />
       <Route name="launcher" path="launcher" component={Launcher}/>

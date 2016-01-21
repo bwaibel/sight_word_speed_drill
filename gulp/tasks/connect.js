@@ -4,6 +4,7 @@ var gulp = require('gulp');
 gulp.task('connect', function() {
   return connect.server({
     root: 'dist',
-    livereload: true
+    livereload: true,
+    fallback: 'dist/404.html'
   });
 });
