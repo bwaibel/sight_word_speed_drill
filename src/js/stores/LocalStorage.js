@@ -1,22 +1,22 @@
-var Backbone = require('backbone');
 
 module.exports = (function() {
   var localStorage = window.localStorage || false;
   return {
-    saveToStorage : function saveToStorage(key, data) {
+    putValue : function (key, data) {
       if(localStorage){
-        localStorage.setItem(key, JSON.stringify(data));
+        if(data == null) {
+          localStorage.removeItem(key);
+        } else {
+          localStorage.setItem(key, JSON.stringify(data));
+        }
       }
     },
-    retrieveFromStorage : function retrieveFromStorage(key) {
+    getValue : function (key, def) {
       if(localStorage && localStorage.getItem(key)){
         return JSON.parse(localStorage.getItem(key));
-      }
-    },
-    removeKey : function removekey(key) {
-      // reset or remove local storage setting
-      if(localStorage && localStorage.getItem(key)){
-        localStorage.removeItem(key);
+      } else if(localStorage && def) {
+        localStorage.setItem(key, JSON.stringify(def));
+        return def;
       }
     }
   };

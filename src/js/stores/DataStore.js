@@ -7,19 +7,21 @@ var assign = require('object-assign');
 var _ = require('underscore');
 
 var Router = require('react-router');
-console.log(Router);
-
+var LocalStorage = require('./LocalStorage');
 var words = require('../constants/Words');
+
 // TODO: calculate an ema 
 var min_reaction_time = 1000;
-var target_guess_time = 2000; // millis per guess looking for 100 guesses per minute
+var target_guess_time = 2000; // millis per guess looking for 30 guesses per minute
 // initialize mean scores with row 0 getting a perfect score and everything else more difficult
-var word_row_means = words.map(function(value,index) {
+var word_row_means = LocalStorage.getValue('means',[target_guess_time]);
+console.log(word_row_means);
+
+/*words.map(function(value,index) {
   return (Math.pow(2, index) * (target_guess_time - min_reaction_time)) + min_reaction_time;
-});
+});*/
 
 function chooseRow() {
-  return 0;
   // rows that are too fast or too slow are penalized 
   var row_scores = word_row_means.map(function(mean) {
     var after_reaction_mean = mean - min_reaction_time;
@@ -58,12 +60,18 @@ var _data = {
 function startDrill() {
   _data.drill_started_at = new Date();
   _data.row_num = chooseRow();
+  _data.words = _.shuffle(words[_data.row_num]);
   nextWord(0);
 }
 
 function endDrill() {
   _data.results = _data.answers;
   _data.answers = [];
+  // if all of the defined row means are below target, add additional rows
+  if(word_row_means.length < words.length && _.every(word_row_means, function(v){return v < target_guess_time;})) {
+    word_row_means.push(target_guess_time);
+    LocalStorage.putValue('means', word_row_means);
+  }
 }
 
 function nextWord(score) {
@@ -73,17 +81,20 @@ function nextWord(score) {
     var current_duration = stop_time - _data.word_started_at;
     if(!isNaN(current_duration) && score > 0) {
       var current_mean = word_row_means[_data.row_num];
-      var ema_alpha = 0.25;
+      var ema_alpha = 0.65;
 
       // keep track of the row's ema
       word_row_means[_data.row_num] = ema_alpha * current_mean + (1 - ema_alpha) * current_duration;
+      LocalStorage.putValue('means', word_row_means);
     }
     
     _data.answers.push({word:_data.word,score:score,duration: stop_time - _data.word_started_at});
   }
   
-  _data.column_num = Math.floor(Math.random() * words[_data.row_num].length)
-  _data.word = words[_data.row_num][_data.column_num];
+  if(_data.words.length == 0) {
+    _data.words = _.shuffle(words[_data.row_num]);
+  }
+  _data.word = _data.words.pop();
   _data.word_started_at = new Date();
 }
 
