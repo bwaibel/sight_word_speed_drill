@@ -6,10 +6,8 @@ module.exports = React.createClass({
 
   render: function() {
     return (
-      <div className="jumbotron">
-        <div className="container text-center">
-          {this.props.children}
-        </div>
+      <div className="container text-center">
+        {this.props.children}
       </div>
     );
   }

@@ -18,7 +18,7 @@ module.exports = React.createClass({
 
   render: function() {
     return (
-      <Link onClick={this.startDrill} to="/drill" className="btn btn-default btn-lg btn-success">Start The Clock!</Link>
+      <h1><Link onClick={this.startDrill} to="/drill" className="btn btn-default btn-lg btn-success">Start The Clock!</Link></h1>
     );
   }
 

@@ -22,9 +22,9 @@ module.exports = React.createClass({
     var reward = num_words < 10 ? "Keep at it." : (num_words < 30 ? "Getting Better." : (num_words < 60 ? "So close..." : "Awesome!!!"));
     return (
       <div className="results">
-        <h1>{num_words} Words{reward.substring(reward.length - 1)}</h1>
-        <h1>{reward}</h1>
-        <Link onClick={this.startDrill} to="/drill" className="btn btn-default btn-lg btn-success">Play Again?</Link>
+        <h2>{num_words} Words{reward.substring(reward.length - 1)}</h2>
+        <h2>{reward}</h2>
+        <h2><Link onClick={this.startDrill} to="/drill" className="btn btn-default btn-success">Play Again?</Link></h2>
       </div>
     );
   }

@@ -23,13 +23,13 @@ module.exports = React.createClass({
   },
   
   componentDidMount: function() {
-    setTimeout(this.endDrill, 6000);
+    setTimeout(this.endDrill, 60000);
   },
 
   render: function() {
     console.log(this.state)
     return (
-      <h1><div onClick={this.guessRight} className="words">{this.state.word}</div></h1>
+      <h1 onClick={this.guessRight}><div className="fill">{this.state.word}</div></h1>
     );
   }
 

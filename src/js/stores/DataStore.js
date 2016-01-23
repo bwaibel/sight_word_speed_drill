@@ -19,6 +19,7 @@ var word_row_means = words.map(function(value,index) {
 });
 
 function chooseRow() {
+  return 0;
   // rows that are too fast or too slow are penalized 
   var row_scores = word_row_means.map(function(mean) {
     var after_reaction_mean = mean - min_reaction_time;
@@ -56,6 +57,7 @@ var _data = {
 
 function startDrill() {
   _data.drill_started_at = new Date();
+  _data.row_num = chooseRow();
   nextWord(0);
 }
 
@@ -80,9 +82,6 @@ function nextWord(score) {
     _data.answers.push({word:_data.word,score:score,duration: stop_time - _data.word_started_at});
   }
   
-  console.log(score, current_duration, word_row_means);
-
-  _data.row_num = chooseRow();
   _data.column_num = Math.floor(Math.random() * words[_data.row_num].length)
   _data.word = words[_data.row_num][_data.column_num];
   _data.word_started_at = new Date();
