@@ -1,7 +1,7 @@
 
-# Internal Analytics Tools
+# Speed tests
 
-> Internally hosted version of report generator and other tools that allows creating scheduling and emailing reports for any set of accounts.
+Spend a minute getting faster at recognizing common patterns.
 
 ## Running your project
 
