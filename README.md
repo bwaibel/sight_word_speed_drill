@@ -3,18 +3,21 @@
 
 Spend a minute getting faster at recognizing common patterns.
 
+http://words.brynkim.com
+
 ## Running your project
 
-To run the project with livereload
+To run the project with livereload (currently broken, probably going to move to
+webpack just for the heck of it)
 
 ```bash
 $ npm install
-$ npm start
+$ gulp
 ```
 
-If you prefer to just build without the live reload and build-on-each-change watcher, run:
+Send it live on gh-pages
 
 ```bash
 $ npm install
-$ npm run build
+$ gulp deploy
 ```

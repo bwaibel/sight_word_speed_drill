@@ -19,7 +19,7 @@ module.exports = React.createClass({
 
   render: function() {
     var num_words = this.state.results.length;
-    var reward = num_words < 10 ? "Keep at it." : (num_words < 30 ? "Getting Better." : (num_words < 60 ? "So close..." : "Awesome!!!"));
+    var reward = num_words < 10 ? "Keep at it." : (num_words < 20 ? "Getting Better." : (num_words < 30 ? "So close..." : "Awesome!!!"));
     return (
       <div className="results">
         <h2>{num_words} Words{reward.substring(reward.length - 1)}</h2>

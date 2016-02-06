@@ -10,7 +10,6 @@ var Router = require('react-router');
 var LocalStorage = require('./LocalStorage');
 var words = require('../constants/Words');
 
-// TODO: calculate an ema 
 var min_reaction_time = 1000;
 var target_guess_time = 2000; // millis per guess looking for 30 guesses per minute
 // initialize mean scores with row 0 getting a perfect score and everything else more difficult
@@ -22,7 +21,7 @@ console.log(word_row_means);
 });*/
 
 function chooseRow() {
-  // rows that are too fast or too slow are penalized 
+  // rows that are too fast or too slow are penalized
   var row_scores = word_row_means.map(function(mean) {
     var after_reaction_mean = mean - min_reaction_time;
     if(after_reaction_mean <= 0) {
@@ -30,7 +29,7 @@ function chooseRow() {
       return 1/500;
     }
     else {
-      // inverse log2 distance from the mean plus 
+      // inverse log2 distance from the mean plus
       return 1 / (1 + Math.abs(Math.log2(after_reaction_mean / (target_guess_time - min_reaction_time))));
     }
   });
@@ -75,7 +74,7 @@ function endDrill() {
 }
 
 function nextWord(score) {
-  
+
   if(score != 0) {
     var stop_time = new Date();
     var current_duration = stop_time - _data.word_started_at;
@@ -87,15 +86,19 @@ function nextWord(score) {
       word_row_means[_data.row_num] = ema_alpha * current_mean + (1 - ema_alpha) * current_duration;
       LocalStorage.putValue('means', word_row_means);
     }
-    
+
     _data.answers.push({word:_data.word,score:score,duration: stop_time - _data.word_started_at});
   }
-  
+
   if(_data.words.length == 0) {
     _data.words = _.shuffle(words[_data.row_num]);
   }
   _data.word = _data.words.pop();
   _data.word_started_at = new Date();
+}
+
+var SpeedGame = {
+
 }
 
 // Facebook style store creation.
@@ -124,7 +127,7 @@ var DataStore = assign({}, EventEmitter.prototype, {
   dispatcherIndex: AppDispatcher.register(function(payload) {
     var action = payload.action;
     switch(action.type) {
-      case ActionTypes.GUESS: 
+      case ActionTypes.GUESS:
         nextWord(action.score);
         DataStore.emitChange();
         break;
