@@ -16,20 +16,20 @@ module.exports = React.createClass({
   guessRight: function(event) {
     Actions.guessRight();
   },
-  
+
   endDrill: function() {
     Actions.endDrill();
     history.replace('/results');
   },
-  
-  componentDidMount: function() {
+
+  componentWillMount: function() {
+    this.startDrill(this.props.params.game);
     setTimeout(this.endDrill, 60000);
   },
 
   render: function() {
-    console.log(this.state)
     return (
-      <h1 onClick={this.guessRight}><div className="fill">{this.state.word}</div></h1>
+      <h1 onClick={this.guessRight}><div className="fill">{this.state.currentItem.word}</div></h1>
     );
   }
 

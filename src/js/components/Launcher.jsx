@@ -13,12 +13,17 @@ module.exports = React.createClass({
   },
 
   startDrill: function(event) {
-    Actions.startDrill();
+    Actions.startDrill("words");
   },
 
   render: function() {
     return (
-      <h1><Link onClick={this.startDrill} to="/drill" className="btn btn-default btn-lg btn-success">Start The Clock!</Link></h1>
+      <div>
+        <h1><Link onClick={this.startDrill} to="/drill/words" className="btn btn-default btn-lg btn-success">Sight Words</Link></h1>
+        <h1><Link onClick={this.startDrill} to="/drill/addition" className="btn btn-default btn-lg btn-success">Adding</Link></h1>
+        <h1><Link onClick={this.startDrill} to="/drill/subtraction" className="btn btn-default btn-lg btn-success">Subtracting</Link></h1>
+        <h1><Link onClick={this.startDrill} to="/drill/multiplication" className="btn btn-default btn-lg btn-success">Multiplying</Link></h1>
+      </div>
     );
   }
 

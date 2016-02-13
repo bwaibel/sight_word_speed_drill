@@ -7,98 +7,28 @@ var assign = require('object-assign');
 var _ = require('underscore');
 
 var Router = require('react-router');
-var LocalStorage = require('./LocalStorage');
 var words = require('../constants/Words');
-
-var min_reaction_time = 1000;
-var target_guess_time = 2000; // millis per guess looking for 30 guesses per minute
-// initialize mean scores with row 0 getting a perfect score and everything else more difficult
-var word_row_means = LocalStorage.getValue('means',[target_guess_time]);
-console.log(word_row_means);
-
-/*words.map(function(value,index) {
-  return (Math.pow(2, index) * (target_guess_time - min_reaction_time)) + min_reaction_time;
-});*/
-
-function chooseRow() {
-  // rows that are too fast or too slow are penalized
-  var row_scores = word_row_means.map(function(mean) {
-    var after_reaction_mean = mean - min_reaction_time;
-    if(after_reaction_mean <= 0) {
-      // faster than reaction time is heavily penalized
-      return 1/500;
-    }
-    else {
-      // inverse log2 distance from the mean plus
-      return 1 / (1 + Math.abs(Math.log2(after_reaction_mean / (target_guess_time - min_reaction_time))));
-    }
-  });
-  var score_sum = row_scores.reduce(function(sum, score) {return sum + score});
-  var cumulative_frequency = row_scores.reduce(function(cumsum, score){
-    var frequency = (score / score_sum);
-    cumsum.push((cumsum[cumsum.length-1]||0)+frequency)
-    return cumsum;
-  }, []);
-  var r = Math.random();
-  return cumulative_frequency.reduce(function(result, next, index) {
-    return result !== undefined ? result : (r < next ? index : undefined);
-  }, undefined);
-}
-
 
 // data storage
 var _data = {
-  word: words[0][0],
-  row_num: 0,
-  column_num: 0,
-  answers: [],
-  drill_started_at: new Date() + 3600000*24*365,
-  word_started_at: new Date(),
+  currentRound: undefined,
+  currentItem: undefined,
+  lastResults: undefined
 };
 
-function startDrill() {
-  _data.drill_started_at = new Date();
-  _data.row_num = chooseRow();
-  _data.words = _.shuffle(words[_data.row_num]);
-  nextWord(0);
+function startDrill(gameName) {
+  console.log('startDrill:', gameName, words, _data);
+  _data.currentRound = words[gameName].startRound();
+  _data.currentItem = _data.currentRound.nextWord(0);
+  console.log('startDrill:', _data);
 }
 
 function endDrill() {
-  _data.results = _data.answers;
-  _data.answers = [];
-  // if all of the defined row means are below target, add additional rows
-  if(word_row_means.length < words.length && _.every(word_row_means, function(v){return v < target_guess_time;})) {
-    word_row_means.push(target_guess_time);
-    LocalStorage.putValue('means', word_row_means);
-  }
+  _data.lastResults = _data.currentRound.endRound();
 }
 
 function nextWord(score) {
-
-  if(score != 0) {
-    var stop_time = new Date();
-    var current_duration = stop_time - _data.word_started_at;
-    if(!isNaN(current_duration) && score > 0) {
-      var current_mean = word_row_means[_data.row_num];
-      var ema_alpha = 0.65;
-
-      // keep track of the row's ema
-      word_row_means[_data.row_num] = ema_alpha * current_mean + (1 - ema_alpha) * current_duration;
-      LocalStorage.putValue('means', word_row_means);
-    }
-
-    _data.answers.push({word:_data.word,score:score,duration: stop_time - _data.word_started_at});
-  }
-
-  if(_data.words.length == 0) {
-    _data.words = _.shuffle(words[_data.row_num]);
-  }
-  _data.word = _data.words.pop();
-  _data.word_started_at = new Date();
-}
-
-var SpeedGame = {
-
+  _data.currentItem = _data.currentRound.nextWord(score);
 }
 
 // Facebook style store creation.
@@ -132,7 +62,7 @@ var DataStore = assign({}, EventEmitter.prototype, {
         DataStore.emitChange();
         break;
       case ActionTypes.START_DRILL:
-        startDrill();
+        startDrill(action.gameName);
         DataStore.emitChange();
         break;
       case ActionTypes.END_DRILL:

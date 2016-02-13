@@ -16,7 +16,7 @@ var routes = (
     <Route name="app" path="/" component={App}>
       <IndexRoute component={Launcher} />
       <Route name="launcher" path="launcher" component={Launcher}/>
-      <Route name="drill" path="drill" component={Drill}/>
+      <Route name="drill" path="drill/:gameName" component={Drill}/>
       <Route name="results" path="results" component={Results}/>
     </Route>
   </Router>

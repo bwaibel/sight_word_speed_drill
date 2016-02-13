@@ -1,4 +1,106 @@
 var _ = require('underscore');
+var LocalStorage = require('../stores/LocalStorage');
+
+var min_reaction_time = 1000;
+
+function chooseRound(means, target) {
+  // rows that are too fast or too slow are penalized
+  var roundScores = means.map(function(mean) {
+    var afterReactionMean = mean - min_reaction_time;
+    if(after_reaction_mean <= 0) {
+      // faster than reaction time is never used
+      return 0;
+    } else {
+      // inverse log2 distance from the mean plus
+      return 1 / (1 + Math.abs(Math.log2(afterReactionMean / (target - min_reaction_time))));
+    }
+  });
+
+  var scoreTotal = roundScores.reduce(function(sum, score) {return sum + score});
+  var cumulativeFrequency = rowScores.reduce(function(cumsum, score){
+    var frequency = (score / scoreTotal);
+    cumsum.push((cumsum[cumsum.length-1]||0)+frequency)
+    return cumsum;
+  }, []);
+  var r = Math.random();
+  return cumulativeFrequency.reduce(function(result, next, index) {
+    return result !== undefined ? result : (r < next ? index : undefined);
+  }, undefined);
+}
+
+function Game(name, target, rounds) {
+  this.name = name;
+  this.target = target;
+  this.rounds = rounds;
+  this.means = LocalStorage.getValue(name+'.means',[target]);
+}
+
+Game.prototype.startRound = function() {
+  var game = this;
+  var startTime = new Date();
+  var roundIndex = chooseRound(this.means, this.target);
+  var results = {};
+  var currentItem = {roundIndex:roundIndex};
+  var currentShuffle = [];
+
+  return {
+    nextWord:function(score) {
+
+      var now = new Date();
+      currentItem.score = score;
+      currentItem.duration = now - currentItem.startedAt;
+
+      if(score != 0) {
+        if(!isNaN(currentItem.duration) && score > 0) {
+          var currentMean = game.means[roundIndex];
+          var alpha = 0.65;
+          // keep track of the row's ema
+          currentItem.mean = game.means[roundIndex] = (alpha * currentMean) + ((1 - alpha) * currentItem.duration);
+        }
+      }
+      results.push(currentItem);
+
+      if(currentShuffle.length == 0) {
+        currentShuffle = _.shuffle(game.rounds[roundIndex]);
+      }
+
+      currentItem = {
+        word: currentShuffle.pop(),
+        startedAt: now,
+        round:round
+      }
+
+      return currentItem;
+
+    },
+    endRound: function() {
+
+      // if all of the defined row means are below target, add additional rows
+      var duration = new Date() - startTime;
+      var currentResult = {
+        duration: duration,
+        expectedResults: duration / game.target,
+        achievedResults: results.length
+      }
+
+      currentResult.score = currentResult.expectedResults / currentResult.achievedResults
+
+      if(game.means.length < game.rounds.length && _.every(game.means, function(v){return v < game.target;})) {
+        game.means.push(game.target);
+        LocalStorage.putValue(game.name + '.means', game.means);
+        priorResults = LocalStorage.getValue(game.name + ".results", []);
+        priorResults.push(currentResult)
+        LocalStorage.putValue(game.name, ".results", priorResults.slice(0,50));
+      }
+
+      return currentResult;
+
+    }
+  }
+}
+
+
+
 var addition = _.range(1,13).map(function(a){
   return _.uniq(_.range(1,13).map(function(b){
     return [b + "+" + a];
@@ -62,4 +164,9 @@ var words = [
   ["water","way","wind","window","wood","water","way","wind","window","wood"]
 ]
 
-module.exports = addition;
+module.exports = {
+  words: new Game("words", 2000, words),
+  addition: new Game("addition", 3000, addition),
+  subtraction: new Game("subtraction", 3000, subtraction),
+  multiplication: new Game("multiplication", 4000, multiplication)
+};

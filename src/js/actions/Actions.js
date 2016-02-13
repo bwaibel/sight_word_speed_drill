@@ -14,9 +14,10 @@ module.exports = {
       score: -1
     })
   },
-  startDrill: function() {
+  startDrill: function(gameName) {
     AppDispatcher.handleViewAction({
-      type: ActionTypes.START_DRILL
+      type: ActionTypes.START_DRILL,
+      gameName: gameName
     })
   },
   endDrill: function() {
@@ -25,4 +26,3 @@ module.exports = {
     })
   }
 }
-
