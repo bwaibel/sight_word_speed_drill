@@ -1,23 +1,23 @@
 var _ = require('underscore');
 var LocalStorage = require('../stores/LocalStorage');
 
-var min_reaction_time = 1000;
+var minReactionTime = 1000;
 
 function chooseRound(means, target) {
   // rows that are too fast or too slow are penalized
   var roundScores = means.map(function(mean) {
-    var afterReactionMean = mean - min_reaction_time;
-    if(after_reaction_mean <= 0) {
+    var afterReactionMean = mean - minReactionTime;
+    if(afterReactionMean <= 0) {
       // faster than reaction time is never used
       return 0;
     } else {
       // inverse log2 distance from the mean plus
-      return 1 / (1 + Math.abs(Math.log2(afterReactionMean / (target - min_reaction_time))));
+      return 1 / (1 + Math.abs(Math.log2(afterReactionMean / (target - minReactionTime))));
     }
   });
 
   var scoreTotal = roundScores.reduce(function(sum, score) {return sum + score});
-  var cumulativeFrequency = rowScores.reduce(function(cumsum, score){
+  var cumulativeFrequency = roundScores.reduce(function(cumsum, score){
     var frequency = (score / scoreTotal);
     cumsum.push((cumsum[cumsum.length-1]||0)+frequency)
     return cumsum;
@@ -39,7 +39,7 @@ Game.prototype.startRound = function() {
   var game = this;
   var startTime = new Date();
   var roundIndex = chooseRound(this.means, this.target);
-  var results = {};
+  var results = [];
   var currentItem = {roundIndex:roundIndex};
   var currentShuffle = [];
 
@@ -67,7 +67,7 @@ Game.prototype.startRound = function() {
       currentItem = {
         word: currentShuffle.pop(),
         startedAt: now,
-        round:round
+        roundIndex:roundIndex
       }
 
       return currentItem;
@@ -88,7 +88,7 @@ Game.prototype.startRound = function() {
       if(game.means.length < game.rounds.length && _.every(game.means, function(v){return v < game.target;})) {
         game.means.push(game.target);
         LocalStorage.putValue(game.name + '.means', game.means);
-        priorResults = LocalStorage.getValue(game.name + ".results", []);
+        var priorResults = LocalStorage.getValue(game.name + ".results", []);
         priorResults.push(currentResult)
         LocalStorage.putValue(game.name, ".results", priorResults.slice(0,50));
       }
