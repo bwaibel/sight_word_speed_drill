@@ -23,6 +23,7 @@ module.exports = React.createClass({
   },
 
   componentWillMount: function() {
+    console.log("Drill.componentWillMount", this);
     Actions.startDrill(this.props.params.gameName);
     setTimeout(this.endDrill, 60000);
   },

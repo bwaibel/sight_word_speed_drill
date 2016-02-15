@@ -33,6 +33,7 @@ function Game(name, target, rounds) {
   this.target = target;
   this.rounds = rounds;
   this.means = LocalStorage.getValue(name+'.means',[target]);
+  console.log("Game", this);
 }
 
 Game.prototype.startRound = function() {
@@ -83,7 +84,7 @@ Game.prototype.startRound = function() {
         achievedResults: results.length
       }
 
-      currentResult.score = currentResult.expectedResults / currentResult.achievedResults
+      currentResult.score = currentResult.achievedResults / currentResult.expectedResults;
 
       if(game.means.length < game.rounds.length && _.every(game.means, function(v){return v < game.target;})) {
         game.means.push(game.target);

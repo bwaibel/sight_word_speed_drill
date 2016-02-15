@@ -20,7 +20,6 @@ module.exports = React.createClass({
   render: function() {
     var result = this.state.lastResults;
     var reward = result.score < .3 ? "Keep at it." : (result.score < .6 ? "Getting Better." : (result.score < .9 ? "So close..." : "Awesome!!!"));
-    reward = "Sweet!"
     return (
       <div className="results">
         <h2>{result.achievedResults} Answers{reward.substring(reward.length - 1)}</h2>
